@@ -76,7 +76,7 @@ This will start the Express.js backend API.
 ## 🤝 Contributing
 Feel free to open issues or submit pull requests if you’d like to contribute!
 
-### 📂 Folder Structure
+# 📂 Folder Structure
 ```
 main-project/
 │
@@ -86,9 +86,27 @@ main-project/
 └── README.md
 ```
 
-### 📂 Detailed Folder Structure
-##### TODO
+# 📂 Detailed Folder Structure
 
+## Frontend
+```
+frontend/
+│
+├── public/     # images/files etc.
+├── src/ 
+├──── assets
+├──── components
+├──── helpers
+├──── hooks
+├──── pages
+├──── redux
+├──── app.css
+├──── app.jsx
+├──── main.jsx
+├───── eslint.config.js
+├── package.json
+└── README.md
+```
 
 
 # 🔧 Environment Configuration

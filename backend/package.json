@@ -1,0 +1,21 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "beta communes eduma backend ...",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "lms",
+    "learning",
+    "management",
+    "system",
+    "online",
+    "learning"
+  ],
+  "author": "Team Beta Communes - Nouman Ali",
+  "license": "MIT"
+}
