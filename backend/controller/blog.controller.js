@@ -1,13 +1,11 @@
 import { validationResult } from "express-validator";
 import mongoose from 'mongoose';
-import { Blog } from "../models/blog.model.js";
+import { Blog } from "../models/blog.js";
 import cloudinary from "../utils/cloudinary.js";
+import { getBuffer } from "../utils/getBuffer.js";
 
-// * Create New Blog -----------------------------------------------------------------------------------------------------------
+// 1. Create Blog -----------------------------------------------------------------------------------------------------------
 export const createBlog = async (req, res) => {
-  console.log("REQ.BODY:", req.body);
-  console.log("REQ.FILES:", req.files);
-  
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const errorMessages = errors.array().map(err => err.msg);
@@ -21,14 +19,12 @@ export const createBlog = async (req, res) => {
   try {
     const { title, category, body, tags } = req.body;
 
-    // Extract uploaded image buffers from Multer
     const imageFiles = [
       req.files.image1?.[0],
       req.files.image2?.[0],
       req.files.image3?.[0]
     ].filter(Boolean);
 
-    // Ensure at least one image is provided
     if (imageFiles.length === 0) {
       return res.status(400).json({
         success: false,
@@ -36,36 +32,28 @@ export const createBlog = async (req, res) => {
       });
     }
 
-    // Upload each image buffer to Cloudinary
     const cloudinaryImages = [];
+
     for (const file of imageFiles) {
-      const uploaded = await cloudinary.uploader.upload_stream({ folder: "blogs" }, async (error, result) => {
-        if (error) throw new Error(error.message);
-        return result;
-      });
-
-      // Wait for stream to finish
-      const streamUpload = () =>
-        new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream({ folder: "blogs" }, (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
-          });
-          stream.end(file.buffer);
+      const buffer = getBuffer(file);
+      if (!buffer?.content) {
+        return res.status(400).json({
+          success: false,
+          message: "❌ Failed to generate file buffer"
         });
+      }
 
-      const result = await streamUpload();
-      cloudinaryImages.push(result.secure_url);
+      const cloud = await cloudinary.uploader.upload(buffer.content, { folder: "blogs" });
+      cloudinaryImages.push(cloud.secure_url);
     }
 
-    // Create blog document
     const newBlog = new Blog({
       title,
       category,
       body,
       tags,
-      // tags: Array.isArray(tags) ? tags : [tags],
-      images: cloudinaryImages
+      images: cloudinaryImages,
+      author: req.id 
     });
 
     const savedBlog = await newBlog.save();
@@ -86,24 +74,20 @@ export const createBlog = async (req, res) => {
   }
 };
 
-
-
-// * Get Blogs Pagination API ------------------------------------------------------------------------------------------------------
-// /api/blogs?page=2&limit=5
+// 2. Get Blogs with Pagination ---------------------------------------------------------------------------------------------
 export const getBlogs = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 10;
     let skip = (page - 1) * limit;
 
-    // Get total blog count
-    let totalRecords = await Blog.countDocuments();
+    const totalRecords = await Blog.countDocuments();
+    const totalPages = Math.ceil(totalRecords / limit);
 
-    // Calculate total pages
-    let totalPages = Math.ceil(totalRecords / limit);
-
-    // Get paginated blogs
-    const blogs = await Blog.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const blogs = await Blog.find()
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit);
 
     return res.status(200).json({
       success: true,
@@ -117,12 +101,16 @@ export const getBlogs = async (req, res) => {
 
   } catch (error) {
     console.log(`❌ Get Blogs Server Error:: ${error.message || error}`);
-    return res.status(500).json({success:false, message:"internal server error", error:error.message || error})
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message || error
+    });
   }
-}
+};
 
-// * Get Single Blog  --------------------------------------------------------------------------------------------------------------------
-export const getSingleBlog = async (req, res)=>{
+// 3. Get Single Blog -------------------------------------------------------------------------------------------------------
+export const getSingleBlog = async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -130,7 +118,6 @@ export const getSingleBlog = async (req, res)=>{
     }
 
     const blog = await Blog.findById(id).maxTimeMS(20000);
-
     if (!blog) {
       return res.status(404).json({ success: false, message: "Blog not found" });
     }
@@ -139,16 +126,20 @@ export const getSingleBlog = async (req, res)=>{
   } catch (error) {
     console.log(`❌ Get Single Blog Server Error:: ${error.message || error}`);
     if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
-      return res.status(504).json({ success: false,  message: "Database operation timed out", suggestion: "Please try again later" });
+      return res.status(504).json({
+        success: false,
+        message: "Database operation timed out",
+        suggestion: "Please try again later"
+      });
     }
-    return res.status(500).json({success:false, message:"internal server error", error:error.message || error})
+    return res.status(500).json({ success: false, message: "Internal server error", error: error.message || error });
   }
-}
+};
 
-
-//  * Delete Blog Admin Proctected -----------------------------------------------------------------------------------------------------------------------------
+// 4. Delete Blog ------------------------------------------------------------------------------------------------------------
 export const deleteBlog = async (req, res) => {
   const { id } = req.params;
+
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ success: false, message: "Invalid blog ID" });
   }
@@ -159,9 +150,22 @@ export const deleteBlog = async (req, res) => {
       return res.status(404).json({ success: false, message: "Blog not found" });
     }
 
-    res.status(200).json({ success: true, message: "Your Blog deleted Successfully." });
+    // Remove each image from Cloudinary
+    const deletePromises = blog.images.map(async (imageUrl) => {
+      const urlParts = imageUrl.split('/');
+      const publicId = urlParts[urlParts.length - 1].split('.')[0];
+      return await cloudinary.uploader.destroy(`blogs/${publicId}`);
+    });
+
+    await Promise.all(deletePromises);
+
+    res.status(200).json({ success: true, message: "✅ Your Blog and its images were deleted successfully." });
   } catch (error) {
     console.log(`❌ deleteBlog Server Error:: ${error.message || error}`);
-    return res.status(500).json({ success: false, message: "Internal server error", error: error.message || error });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message || error
+    });
   }
 };

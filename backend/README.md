@@ -130,12 +130,14 @@ backend/
 │   └── rate-limiting.js
 │
 ├── models/
-│   ├── blog.model.js
-│   ├── user.model.js
+│   ├── blog.js
+│   ├── order.js
+│   ├── pastPaper.js
+│   ├── user.js
 │   └── [other models]
 │
 ├── routes/
-│   └── blog.model.js
+│   └── blog.js
 │
 ├── utils/
 │   ├── cloudinary.js
