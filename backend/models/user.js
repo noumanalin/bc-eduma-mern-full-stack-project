@@ -1,23 +1,37 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: [true, "Name is required"] },
-    email: {type: String, required: [true, "Email is required"], unique: true, lowercase: true,trim: true },
-    password: {type: String,  required: [true, "Password is required"],  minlength: [3, "Password must be at least 3 characters long"] },
+    email: { 
+        type: String, 
+        required: [true, "Email is required"], 
+        unique: true, 
+        lowercase: true,
+        trim: true 
+    },
+    password: {
+        type: String,  
+        required: [true, "Password is required"],  
+        minlength: [3, "Password must be at least 3 characters long"] 
+    },
     cartCourses: [
-    {
-        quantity: { type: Number, default: 1 },
-        product: { type: mongoose.Schema.Types.ObjectId, ref: "Course" }
-    }
+        {
+            quantity: { type: Number, default: 1 },
+            product: { type: mongoose.Schema.Types.ObjectId, ref: "Course" }
+        }
     ],
     cartPapers: [
-    {
-        quantity: { type: Number, default: 1 },
-        product: { type: mongoose.Schema.Types.ObjectId, ref: "PastPaper" }
-    }
+        {
+            quantity: { type: Number, default: 1 },
+            product: { type: mongoose.Schema.Types.ObjectId, ref: "PastPaper" }
+        }
     ],
-    role: { type: String, enum: ["user", "admin"], default: "user" }
-}, { timestamps: true })
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+    otp: { type: String },
+    otpExpiryTime: { type: Date },
+    isVerified: { type: Boolean, default: false }
+}, { timestamps: true });
 
 
 // Pre-save Hook to hash password before saving to database
@@ -40,5 +54,4 @@ userSchema.methods.comparePassword = async function (password) {
     return bcrypt.compare(password, this.password);
 };
 
-const User = mongoose.models.User || mongoose.model('User', userSchema); 
-export default User;
+export const User = mongoose.models.User || mongoose.model('User', userSchema); 

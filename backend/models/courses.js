@@ -23,7 +23,7 @@ const courseSchema = new mongoose.Schema({
   tags: [String], // e.g., ["FSc", "Part 1"]
   certificate: {
     type: Boolean,
-    default: false //  Offer certificate after completion
+    default: true 
   },
 
   enrolledUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

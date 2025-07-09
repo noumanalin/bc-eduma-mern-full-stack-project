@@ -4,6 +4,65 @@
 
 
 
+# 👤 User Authentication API Documentation
+
+## 🔐 Authentication Endpoints
+
+| No. | Title                | Method | Base URL               | Route                          | Protected By        | Description                          |
+|-----|----------------------|--------|------------------------|--------------------------------|---------------------|--------------------------------------|
+| 1   | User Registration    | POST   | http://localhost:3000  | /api/user/signup               | Public              | Register new user with OTP verification |
+| 2   | Verify OTP           | POST   | http://localhost:3000  | /api/user/verify-otp           | Public              | Verify user email with OTP           |
+| 3   | User Login           | POST   | http://localhost:3000  | /api/user/login                | Public              | Authenticate user and get JWT token   |
+| 4   | User Logout          | GET    | http://localhost:3000  | /api/user/logout               | isLogedIn           | Clear authentication cookie          |
+| 5   | Get User Profile     | GET    | http://localhost:3000  | /api/user/me                   | isLogedIn           | Get authenticated user's profile data |
+
+## 📦 Response Examples
+
+### 💻 Signup Successful Response  
+```json
+{
+  "success": true,
+  "message": "Account created. Please verify your email via OTP.",
+  "user": {
+    "_id": "65a1b2c3d4e5f6g7h8i9j0k",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "isVerified": false
+  }
+}
+```
+### 💻 Login Successful Response
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "user": {
+    "_id": "65a1b2c3d4e5f6g7h8i9j0k",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "isVerified": true
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+### User Profile
+```json
+{
+  "success": true,
+  "user": {
+    "_id": "65a1b2c3d4e5f6g7h8i9j0k",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "isVerified": true,
+    "createdAt": "2023-12-15T10:30:00.000Z",
+    "updatedAt": "2023-12-15T10:30:00.000Z"
+  },
+  "orders": []
+}
+```
 
 
 # 📝 Blog API Documentation
@@ -104,8 +163,6 @@ This API fetches blogs with pagination.
   "errArray":["Blog title must not be empty.","Blog title must have at least 25 characters.","Blog body is required."],
   "message":"🙏 Kindly fulfill all requirements."}
 ```
-
-
 
 
 

@@ -6,9 +6,14 @@ import express from 'express';
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
+import ejs from 'ejs'
+import path from 'path'
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 import { connectDB } from './utils/connectDB.js';
-import blogRoutes from './routes/blogs.routes.js'
+import blogRoutes from './routes/blogs.routes.js';
+import userRoutes from './routes/user.routes.js'
 
 const totalCpus = os.cpus().length;
 const PORT = process.env.PORT;
@@ -32,14 +37,16 @@ app.use(cors({
     methods: ["GET", "POST"],
     credentials: true
 }));
-
+app.set("view engine", "ejs");
+app.set("views", path.resolve(__dirname, "./views"))
 
 
 app.get('/', (req, res)=>{
         return res.json({success:true, message:`hello cluster nodejs server & worker processor id is ${process.pid}`})
     })
 
-app.use('/api', blogRoutes)
+app.use('/api', blogRoutes);
+app.use('/api/user', userRoutes);
 
 
 
