@@ -13,14 +13,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 import { connectDB } from './utils/connectDB.js';
 import blogRoutes from './routes/blogs.routes.js';
-import userRoutes from './routes/user.routes.js'
+import userRoutes from './routes/user.routes.js';
+import './queueAndWorker/email.worker.js'
+import { sendOtpEmailQueue } from './queueAndWorker/email.queue.js';
 
 const totalCpus = os.cpus().length;
 const PORT = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://localhost:5174"
 
 const app = express();
-
    
 if(cluster.isPrimary){
     for(let i=0; i<totalCpus-3; i++){
@@ -44,6 +45,14 @@ app.set("views", path.resolve(__dirname, "./views"))
 app.get('/', (req, res)=>{
         return res.json({success:true, message:`hello cluster nodejs server & worker processor id is ${process.pid}`})
     })
+app.get('/test-email', async (req, res) => {
+    await sendOtpEmailQueue.add('test-email', {
+        name: 'Test User',
+        email: 'nouman.ali.vu@gmail.com',
+        otp: '123456'
+    });
+    res.json({success: true, message: 'Email queued'});
+});
 
 app.use('/api', blogRoutes);
 app.use('/api/user', userRoutes);

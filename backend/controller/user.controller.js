@@ -1,13 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { validationResult } from "express-validator";
-import { User } from '../models/user.js';
-import { Order } from '../models/order.js';
-import { sendEmail } from '../utils/nodeMailer.js';
-import ejs from 'ejs';
 import crypto from 'crypto';
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+import { User } from '../models/user.js';
+import { Order } from '../models/order.js'; 
+import { sendOtpEmailQueue } from '../queueAndWorker/email.queue.js';
+
+
 
 
 // ------------------------------------------ Helper Functions ---------------------------------------------------------------------------
@@ -43,8 +42,7 @@ export const signUp = async (req, res) => {
 
         const user = await User.create({ name, email, password, otp, otpExpiryTime });
 
-        const htmlBody = await ejs.renderFile(path.join(__dirname, '../views/otpEmail.ejs'), { name, otp, appName: "edu Beta Communes" });
-        await sendEmail(email, "Verify Your Email", htmlBody);
+        await sendOtpEmailQueue.add('sendOtp', {name, email, otp})
 
         res.status(201).json({
             success: true,

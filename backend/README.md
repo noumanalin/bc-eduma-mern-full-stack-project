@@ -192,6 +192,10 @@ backend/
 │   ├── pastPaper.js
 │   ├── user.js
 │   └── [other models]
+│ 
+├── queueAndWorker/
+│   ├── email.queue.js
+│   └── email.worker.js
 │
 ├── routes/
 │   └── blog.js
@@ -202,9 +206,98 @@ backend/
 │
 ├── .env
 ├── app.js
+├── docker-compose.yml
+├── Dockerfile
 ├── package-lock.json
 ├── package.json
 └── README.md
 
 
 ```
+
+
+# 🚀 Docker Setup for Backend + Redis
+
+This project uses **Docker Compose** to run the Node.js backend and Redis queue server together.
+
+---
+
+## 🐳 Start Services
+
+Run the following command to start the backend and Redis:
+
+```bash
+docker-compose up -d
+```
+If you've made changes to the Dockerfile or dependencies, use:
+```
+docker-compose up -d --build
+```
+# 📦 Services
+- backend: Node.js server (MERN API)
+- redis: Redis server (used by BullMQ for background job queues)
+- command to open redis cli: docker exec -it backend-redis-1 redis-cli
+- then entry ping you get pong in response means your redis works correctly.
+
+## 🪵 Monitor Logs
+To follow real-time logs of the backend:
+```
+docker-compose logs -f backend
+```
+To check Redis logs:
+```
+docker-compose logs -f redis
+```
+
+## 🧹 Stop All Services
+To stop all running containers:
+```
+docker-compose down
+```
+This will stop and remove the containers.
+
+
+# rough work
+## ? Bull Board > npm install @bull-board/express
+Use Bull Board for Monitoring 
+
+```yaml
+services:
+  redis:
+    image: redis:7.2
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+    container_name: backend-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: npm run dev
+    depends_on:
+      - redis
+```
+### Setup (add in app.js):
+```code 
+import { createBullBoard } from '@bull-board/api';
+import { ExpressAdapter } from '@bull-board/express';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
+import { emailQueue } from './queues/emailQueue.js';
+
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/admin/queues');
+
+createBullBoard({
+  queues: [new BullMQAdapter(emailQueue)],
+  serverAdapter,
+});
+app.use('/admin/queues', serverAdapter.getRouter());
+```
+Now visit: http://localhost:3000/admin/queues to see your job dashboard!
+
