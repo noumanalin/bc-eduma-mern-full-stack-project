@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {User} from '../models/user.js';
+import { json } from 'express';
 
 export const isLogedin = async (req, res, next) => {
     try {
@@ -10,12 +11,13 @@ export const isLogedin = async (req, res, next) => {
             return res.status(401).json({ success: false, message: "unauthorized access, plz login to use this service" });
         }
 
-        const decode = jwt.verify(token, process.env.JWT_SECRET);
+        const decodeUser = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(`decodeUser: ${JSON.stringify(decodeUser)}`);
 
-        const findUser = await User.findById(decode.userId).select("-password");
+        const findUser = await User.findById(decodeUser?.user?._id).select("-password");
 
         if (!findUser) {
-            return res.status(404).json({ success: false, message: "User not found" });
+            return res.status(404).json({ success: false, message: "User not found", decodeUser });
         }
 
         req.id = findUser._id;

@@ -64,6 +64,186 @@
 }
 ```
 
+# 🎓 Course Management API Documentation
+
+## 🚀 Base URL
+```
+http://localhost:3000/api/course
+```
+---
+
+## 🔐 Admin Endpoints
+
+| No. | Title           | Method | Route             | Protected By       | Description                             |
+|-----|------------------|--------|-------------------|--------------------|-----------------------------------------|
+| 1   | Create Course  ✔  | POST   | /create           | isLogedin, isAdmin | Create a new course (All fields required) |
+| 2   | Update Course    | PUT    | /update/:id       | isLogedin, isAdmin | Update an existing course               |
+| 3   | Delete Course    | DELETE | /delete/:id       | isLogedin, isAdmin | Delete a course                         |
+| 4   | Dashboard Stats ✔    | GET    | /stats            | isLogedin, isAdmin | Get total courses, enrollments, revenue |
+| 5   | Test Admin   ✔    | GET    | /test/admin       | isLogedin, isAdmin | Test admin status                       |
+
+---
+
+## 🎓 Student/User Endpoints
+
+| No. | Title         | Method | Route           | Protected By | Description                  |
+|-----|---------------|--------|-----------------|--------------|------------------------------|
+| 6   | Enroll Course ✔ | POST   | /enroll/:id     | isLogedin    | Enroll in a course with course id |
+
+---
+
+## 🌍 Public Endpoints
+
+| No. | Title           | Method | Route            | Protected By | Description                 |
+|-----|------------------|--------|------------------|--------------|-----------------------------|
+| 7   | Get All Courses ✔ | GET    | /getAll          | Public       | Fetch all available courses |
+| 8   | Get Single Course ✔| GET    | /getSingle/:id   | Public       | Fetch one course by ID      |
+
+---
+
+# Details Documentation Section of Course Management API  
+## 1. 📌 Create Course — Required Fields
+
+> All fields below **must** be included in the request.
+
+| Field         | Type     | Required | Description                       |
+|---------------|----------|----------|-----------------------------------|
+| `title`       | String   | ✅       | Course title                      |
+| `description` | String   | ✅       | Detailed description              |
+| `price`       | Number   | ✅       | Course price                      |
+| `isFree`      | Boolean  | ✅       | Whether course is free or not     |
+| `content`     | String   | ✅       | Course content (HTML/Markdown)    |
+| `totalLessons`| Number   | ✅       | Number of lessons                 |
+| `duration`    | String   | ✅       | Course duration (e.g. "3h 30m")   |
+| `language`    | String   | ✅       | Course language                   |
+| `level`       | String   | ✅       | Beginner / Intermediate / Expert |
+| `category`    | String   | ✅       | Category like "Programming"       |
+| `tags`        | Array    | ✅       | Tags like ["React", "Web Dev"]    |
+| `certificate` | Boolean  | ✅       | Whether certificate is included   |
+| `published`   | Boolean  | ✅       | Should course be visible or not   |
+| `image`       | File     | ✅       | Thumbnail image (via `multipart/form-data`) |
+
+---
+
+## 📤 Create Course — API Request (Form Data)
+
+**URL**: `POST /api/course/create`
+
+**Protected By**: `isLogedin`, `isAdmin`
+
+**Content-Type**: `multipart/form-data`
+
+### ✅ Example Form Data (Postman)
+
+| Key           | Value                                 | Type     |
+|---------------|----------------------------------------|----------|
+| title         | "Learn React.js"                      | Text     |
+| description   | "Complete beginner to advanced course" | Text     |
+| price         | 29.99                                  | Text     |
+| isFree        | false                                  | Text     |
+| content       | "React course syllabus here..."        | Text     |
+| totalLessons  | 12                                     | Text     |
+| duration      | "5h 30m"                               | Text     |
+| language      | "English"                              | Text     |
+| level         | "Beginner"                             | Text     |
+| category      | "Web Development"                      | Text     |
+| tags          | ["React", "JavaScript"]                | Text     |
+| certificate   | true                                   | Text     |
+| published     | true                                   | Text     |
+| image         | (upload thumbnail file)                | File     |
+
+---
+
+## 📦 Successful Create Response
+
+```json
+{
+  "success": true,
+  "message": "Course created successfully",
+  "course": {
+    "_id": "123abc456def",
+    "title": "Learn React.js",
+    "description": "Complete beginner to advanced course",
+    "price": 29.99,
+    "isFree": false,
+    "thumbnail": "https://res.cloudinary.com/.../image.png",
+    ...
+  }
+}
+```
+
+## 2. ✏️ **Update Course** success response
+
+## 3. 🗑️ **Delete Course** success response
+
+## 4. 📊 **Dashboard Stats** success response
+```json
+{
+  "success":true,
+  "stats":{"totalCourses":2,"totalEnrollments":1,"totalRevenue":0}
+}
+```
+
+## 5. 🛡️ **Test Admin** success response
+🔒 This is only a protected test route.
+
+
+
+## 6. 🎓 **Enroll Course**
+```json
+{"success":true,"message":"Enrolled successfully in course","course":{"rating":{"average":0,"count":0},"_id":"6876872a17af751a21597fd4","title":"Learn React.js","description":"Complete beginner to advanced course","thumbnail":"https://res.cloudinary.com/dnq3g9as7/image/upload/v1752598314/courses/hjbodrjwelijrltuaw7t.jpg","price":29.99,"isFree":false,"content":"React course syllabus here...","totalLessons":12,"duration":"5h 30m","language":"English","level":"beginner","category":"Web Development","tags":["[\"React\", \"JavaScript\"] "],"certificate":true,"enrolledUsers":["687681adf3ad2cd44cf8ecd1"],"numberOfStudents":1,"createdBy":"687681adf3ad2cd44cf8ecd1","published":true,"createdAt":"2025-07-15T16:51:54.543Z","updatedAt":"2025-07-15T17:10:26.087Z","__v":1}}
+```
+
+## 7. 📚 **Get All Courses Response** success response
+Returns a list of all available courses.
+```json
+{
+  "success":true,
+  "total":1,
+  "courses":[]
+}
+```
+## 8. 📖 **Get Single Course** with id response
+```json
+{
+    "success": true,
+    "course": {
+        "rating": {
+            "average": 0,
+            "count": 0
+        },
+        "_id": "6876872a17af751a21597fd4",
+        "title": "Learn React.js",
+        "description": "Complete beginner to advanced course",
+        "thumbnail": "https://res.cloudinary.com/dnq3g9as7/image/upload/v1752598314/courses/hjbodrjwelijrltuaw7t.jpg",
+        "price": 29.99,
+        "isFree": false,
+        "content": "React course syllabus here...",
+        "totalLessons": 12,
+        "duration": "5h 30m",
+        "language": "English",
+        "level": "beginner",
+        "category": "Web Development",
+        "tags": [
+            "[\"React\", \"JavaScript\"] "
+        ],
+        "certificate": true,
+        "enrolledUsers": [],
+        "numberOfStudents": 0,
+        "createdBy": {
+            "_id": "687681adf3ad2cd44cf8ecd1",
+            "name": "Ali Admin",
+            "email": "noumanalivu@gmail.com",
+            "role": "admin"
+        },
+        "published": true,
+        "createdAt": "2025-07-15T16:51:54.543Z",
+        "updatedAt": "2025-07-15T16:51:54.543Z",
+        "__v": 0
+    }
+}
+```
+
 
 # 📝 Blog API Documentation
 

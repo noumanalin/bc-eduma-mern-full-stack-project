@@ -11,11 +11,14 @@ import path from 'path'
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+import './queueAndWorker/email.worker.js'
+import { sendOtpEmailQueue } from './queueAndWorker/email.queue.js';
+
 import { connectDB } from './utils/connectDB.js';
 import blogRoutes from './routes/blogs.routes.js';
 import userRoutes from './routes/user.routes.js';
-import './queueAndWorker/email.worker.js'
-import { sendOtpEmailQueue } from './queueAndWorker/email.queue.js';
+import coursesRoutes from './routes/courses.routes.js'
+
 
 const totalCpus = os.cpus().length;
 const PORT = process.env.PORT;
@@ -56,6 +59,7 @@ app.get('/test-email', async (req, res) => {
 
 app.use('/api', blogRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/course', coursesRoutes)
 
 
 

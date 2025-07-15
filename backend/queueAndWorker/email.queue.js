@@ -4,7 +4,7 @@ import IORedis from 'ioredis';
 const redis_url = process.env.REDIS_URL || "redis://localhost:6379";
 const redisConnection = new IORedis(redis_url, {
   maxRetriesPerRequest: null,  
-  enableReadyCheck: false      // Optional but recommended
+  enableReadyCheck: false   
 });
 
 const otpQueue = new Queue('send-otp-email-queue', {

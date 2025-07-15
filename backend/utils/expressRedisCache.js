@@ -2,13 +2,12 @@ import cache from 'express-redis-cache';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const redisCache = cache({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  expire: 60 // Cache expires after 60 seconds
+export const redisCache = cache({
+  host: process.env.REDIS_HOST || '127.0.0.1',
+  port: process.env.REDIS_PORT || 6379,
+  expire: 10 * 60  
 });
-
-export default redisCache;
+ 
 
 
 // who to use
