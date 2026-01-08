@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Email Verification</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      background-color: #ffffff;
+      padding: 30px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .otp-code {
+      display: inline-block;
+      background-color: #f0f7ff;
+      padding: 15px 30px;
+      border-radius: 6px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #2563eb;
+      letter-spacing: 4px;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 13px;
+      color: #777;
+    }
+
+    .footer a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    h2 {
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    hr {
+      margin: 20px 0;
+      border: none;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Verify Your Email Address</h2>
+    </div>
+
+    <p>Hi <strong><%= name %></strong>,</p>
+
+    <p>Thank you for signing up with us. Please use the OTP below to verify your email:</p>
+
+    <div class="otp-code"><%= otp %></div>
+
+    <p>This OTP is valid for <strong>1 hour</strong>.</p>
+
+    <p>If you didn’t request this, you can safely ignore this email.</p>
+
+    <hr />
+
+    <div class="footer">
+      <p>Regards,</p>
+      <p>Best regards,<br>The <%= appName %> Team</p>
+      <p>© <%= new Date().getFullYear() %> <%= appName %>. All rights reserved.</p>
+
+      <h4>Contact Us</h4>
+      <p><a href="mailto:support@betacommunes.com">support@betacommunes.com</a></p>
+      <p>Senior MERN Stack Dev: <a href="mailto:asadali@betacommunes.com">Asad Ali</a></p>
+      <p>Full Stack Node/Next.js Dev: <a href="mailto:noumanali@betacommunes.com">Nouman Ali</a></p>
+      <p>Frontend React.js Dev: <a href="mailto:wasiqali@betacommunes.com">Wasiq Ali</a></p>
+    </div>
+  </div>
+</body>
+</html>

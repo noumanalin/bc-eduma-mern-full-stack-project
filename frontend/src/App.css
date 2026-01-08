@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+
+:root {
+  --primary-color:#098ce9;
+  --primary-variant-color: #049394;
+  --section-bg-color:#f1f2f8;
+  --text-color: #333;
+}
+
+/* Custom */
+.primary-text {
+  color: var(--primary-color);
+  transition: color 0.3s ease-in-out;
+}
+
+.h-ptv:hover { /* hover-primary-text-variant */
+  color: var(--primary-variant-color);
+}
+
+.bg-primary {
+  background-color: var(--primary-color);
+  transition: background-color 0.3s ease-in-out;
+}
+
+.bg-primary:hover {
+  background-color: var(--primary-variant-color);
+}
+ 
+.color-smooth {
+  transition: color 0.4s ease-in-out;
+}
+
+.bg-smooth {
+    transition: background-color 0.4s ease-in-out;
+}
+
+.smooth-all {
+  transition: all 0.3s ease-in-out;
+}
+
+button {
+  cursor: pointer;
+}
+
+
+/* Tailwind Custom Class */
+.cont {
+  max-width: 1290px;
+  margin-inline: auto;
+  padding-inline: 10px;
+}
+
+.center-center {
+  @apply flex justify-center items-center;
+}
+
+.flex-bc {
+  @apply flex justify-between items-center;
+}
+
+.gray {
+  @apply text-gray-700 tracking-tight;
+}
+
+
+/* Navbar */
+ul.nav-links a {
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  word-spacing: 0.1px;
+}
+
+ul.nav-links li a {
+  line-height: 60px;
+  transition: color 0.15s linear;
+}
+
+ul.nav-links li a.active {
+  color: var(--primary-color);
+}
+
+ul.nav-links li:hover {
+  color: var(--primary-color);
+}
+
+/* Animations */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeUp {
+  animation: fadeUp 4s ease-out both;
+}
